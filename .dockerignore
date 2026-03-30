@@ -1,0 +1,11 @@
+node_modules
+npm-debug.log
+credentials.json
+.env
+.git
+.gitignore
+README.md
+Dockerfile
+.dockerignore
+C:\Users\Hp\.gemini\antigravity\brain
+C:\Users\Hp\.gemini\antigravity\brain\**

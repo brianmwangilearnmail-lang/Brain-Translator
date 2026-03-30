@@ -1,0 +1,1 @@
+{"detected_language":{"language":"en","score":0.97},"translated_language":"es","translation":"¡Hola, mundo!\nEsto es una prueba.\n"}

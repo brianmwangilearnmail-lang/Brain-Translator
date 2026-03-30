@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Translator | Precision AI Document Translation</title>
+    <meta name="description"
+        content="Translate PDF, DOCX, and PPTX while keeping 100% of your original layout and design using advanced GCP AI.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --secondary: #8b5cf6;
+            --bg: #030712;
+            --surface: rgba(17, 24, 39, 0.7);
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        .glass {
+            background: var(--surface);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .hero-mesh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('assets/hero.png');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.15;
+            z-index: -1;
+            filter: saturate(1.5) brightness(0.8);
+        }
+
+        .glow {
+            box-shadow: 0 0 40px -10px var(--primary);
+        }
+
+        .text-gradient {
+            background: linear-gradient(to right, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .float {
+            animation: float 6s ease-in-out infinite;
+        }
+    </style>
+</head>
+
+<body class="selection:bg-blue-500/30">
+    <div class="hero-mesh"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between glass px-6 py-3 rounded-2xl">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white">B
+                </div>
+                <span class="text-xl font-bold tracking-tight">Brain<span class="text-blue-500">Translator</span></span>
+            </div>
+            <div class="hidden md:flex items-center gap-8 text-sm font-medium text-gray-400">
+                <a href="#features" class="hover:text-white transition-colors">Features</a>
+                <a href="#how-it-works" class="hover:text-white transition-colors">Process</a>
+                <a href="#app"
+                    class="px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-500 transition-all shadow-lg shadow-blue-500/20">Launch
+                    App</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative pt-32 pb-20 px-6">
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="reveal text-5xl md:text-7xl font-extrabold mb-6 tracking-tight leading-tight">
+                Translate Anything. <br>
+                <span class="text-gradient">Preserve Everything.</span>
+            </h1>
+            <p class="reveal max-w-2xl mx-auto text-gray-400 text-lg md:text-xl mb-10">
+                The world's most precise document translation engine. Convert layout-heavy files into any language with
+                pixel-perfect accuracy using advanced neural networks.
+            </p>
+            <div class="reveal flex flex-wrap justify-center gap-4">
+                <a href="#app"
+                    class="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-2xl transition-all shadow-xl shadow-blue-500/30 flex items-center gap-2">
+                    Get Started Free
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                    </svg>
+                </a>
+                <a href="#features"
+                    class="px-8 py-4 glass hover:bg-white/5 font-semibold rounded-2xl transition-all">Explore
+                    Features</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main App Section -->
+    <section id="app" class="py-20 px-6 scroll-mt-24">
+        <div class="max-w-4xl mx-auto">
+            <div class="reveal p-1 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-[2.5rem]">
+                <main class="glass p-8 md:p-12 rounded-[2.3rem] shadow-2xl relative overflow-hidden">
+                    <!-- Background blobs -->
+                    <div class="absolute -top-24 -right-24 w-64 h-64 bg-blue-600/10 rounded-full blur-3xl"></div>
+                    <div class="absolute -bottom-24 -left-24 w-64 h-64 bg-purple-600/10 rounded-full blur-3xl"></div>
+
+                    <div id="upload-section" class="relative z-10">
+                        <div class="text-center mb-10">
+                            <h2 class="text-3xl font-bold mb-2">Translation Hub</h2>
+                            <p class="text-gray-400">Upload your source file and select target language</p>
+                        </div>
+
+                        <div id="drop-zone"
+                            class="border-2 border-dashed border-gray-700 hover:border-blue-500 hover:bg-white/5 rounded-3xl p-12 text-center transition-all duration-300 cursor-pointer group">
+                            <div class="flex flex-col items-center">
+                                <div
+                                    class="w-20 h-20 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                                    <svg class="w-10 h-10 text-blue-500" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                                        </path>
+                                    </svg>
+                                </div>
+                                <p class="text-2xl font-semibold mb-2 drop-text">Drop document here</p>
+                                <p class="text-gray-500 text-sm">PDF, DOCX, PPTX, XLSX (max 20MB)</p>
+                                <input type="file" id="file-input" class="hidden" accept=".pdf,.docx,.pptx,.xlsx">
+                            </div>
+                        </div>
+
+                        <div class="mt-8 flex flex-col md:flex-row gap-6">
+                            <div class="flex-grow">
+                                <label
+                                    class="block text-sm font-semibold text-gray-400 mb-3 ml-1 uppercase tracking-wider">Target
+                                    Language</label>
+                                <div class="relative">
+                                    <select id="language-select"
+                                        class="w-full bg-slate-900/50 border border-gray-700/50 rounded-2xl px-6 py-4 focus:ring-2 focus:ring-blue-500 outline-none appearance-none cursor-pointer">
+                                        <option value="es">Spanish (Español)</option>
+                                        <option value="fr">French (Français)</option>
+                                        <option value="de">German (Deutsch)</option>
+                                        <option value="ja">Japanese (日本語)</option>
+                                        <option value="sw">Swahili (Kiswahili)</option>
+                                        <option value="ar">Arabic (العربية)</option>
+                                        <option value="zh">Chinese (简体中文)</option>
+                                        <option value="ru">Russian (Русский)</option>
+                                        <option value="it">Italian (Italiano)</option>
+                                        <option value="pt">Portuguese (Português)</option>
+                                    </select>
+                                    <div
+                                        class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 9l-7 7-7-7"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex items-end">
+                                <button id="translate-btn"
+                                    class="w-full md:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 px-10 rounded-2xl transition-all shadow-lg shadow-blue-600/20 active:scale-95 disabled:opacity-50">
+                                    Process Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="loading-section" class="hidden py-16 text-center">
+                        <div class="relative inline-block mb-8">
+                            <div class="w-24 h-24 border-4 border-blue-500/20 rounded-full"></div>
+                            <div
+                                class="w-24 h-24 border-4 border-blue-500 border-t-transparent rounded-full animate-spin absolute top-0 left-0">
+                            </div>
+                        </div>
+                        <h3 class="text-3xl font-bold mb-3 loading-pulse">Analyzing Layout...</h3>
+                        <p class="text-gray-400 text-lg">Our AI is re-mapping document elements.</p>
+                    </div>
+
+                    <!-- Result State -->
+                    <div id="result-section" class="hidden py-12 text-center">
+                        <div
+                            class="w-24 h-24 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-8 glow shadow-green-500/10">
+                            <svg class="w-12 h-12 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M5 13l4 4L19 7"></path>
+                            </svg>
+                        </div>
+                        <h2 class="text-3xl font-bold mb-4">Document Ready!</h2>
+                        <p class="text-gray-400 mb-10 text-lg">The translation is complete with original layout
+                            preserved.</p>
+
+                        <div class="flex flex-col items-center gap-6">
+                            <a id="download-link" href="#"
+                                class="w-full md:w-auto bg-green-600 hover:bg-green-500 text-white font-bold py-5 px-12 rounded-2xl transition-all flex items-center justify-center gap-3 shadow-xl shadow-green-600/20">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                        d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                </svg>
+                                Download Translated File
+                            </a>
+                            <button id="reset-btn"
+                                class="text-gray-500 hover:text-white font-medium transition-colors border-b border-transparent hover:border-gray-500">Translate
+                                New Document</button>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-32 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-20">
+                <h2 class="reveal text-4xl md:text-5xl font-bold mb-6">Designed for <span
+                        class="text-gradient">Professional Accuracy</span></h2>
+                <p class="reveal text-gray-400 max-w-2xl mx-auto">Why choose Brain Translator for your enterprise
+                    localized documents.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="reveal glass p-10 rounded-[2.5rem] hover:bg-white/5 transition-all">
+                    <div class="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-8">
+                        <svg class="w-7 h-7 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Layout Preservation</h3>
+                    <p class="text-gray-400 leading-relaxed">Our AI analyzes document structure, mapping images, font
+                        weights, and grid alignments perfectly.</p>
+                </div>
+
+                <div class="reveal glass p-10 rounded-[2.5rem] hover:bg-white/5 transition-all"
+                    style="transition-delay: 100ms">
+                    <div class="w-14 h-14 bg-purple-500/10 rounded-2xl flex items-center justify-center mb-8">
+                        <svg class="w-7 h-7 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 5h12M9 3v2m1.048 9.5a18.022 18.022 0 01-3.827-5.802m3.307 9.348a18.156 18.156 0 01-1.306-2.428M15 18h11M20 14v8m-1.5-1.5L21 21.432">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Neural Translation</h3>
+                    <p class="text-gray-400 leading-relaxed">Powered by Google's latest transformer models, ensuring
+                        natural flow and technical context across 100+ languages.</p>
+                </div>
+
+                <div class="reveal glass p-10 rounded-[2.5rem] hover:bg-white/5 transition-all"
+                    style="transition-delay: 200ms">
+                    <div class="w-14 h-14 bg-green-500/10 rounded-2xl flex items-center justify-center mb-8">
+                        <svg class="w-7 h-7 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Secure Processing</h3>
+                    <p class="text-gray-400 leading-relaxed">Documents are encrypted in transit and at rest, processed
+                        within ephemeral isolated environments that auto-purge after 1 hour.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-20 px-6 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
+            <div>
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-bold text-white">B
+                    </div>
+                    <span class="text-xl font-bold tracking-tight">Brain<span
+                            class="text-blue-500">Translator</span></span>
+                </div>
+                <p class="text-gray-500 text-sm">Empowering global communication through AI.</p>
+            </div>
+            <div class="flex gap-12 text-sm text-gray-500">
+                <div class="flex flex-col gap-4">
+                    <span class="text-white font-bold">Solutions</span>
+                    <a href="#" class="hover:text-blue-400 transition-colors">PDF Translation</a>
+                    <a href="#" class="hover:text-blue-400 transition-colors">Corporate Reports</a>
+                </div>
+                <div class="flex flex-col gap-4">
+                    <span class="text-white font-bold">Technology</span>
+                    <a href="#" class="hover:text-blue-400 transition-colors">GCP Advanced API</a>
+                    <a href="#" class="hover:text-blue-400 transition-colors">Neural Layout Engine</a>
+                </div>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto mt-20 pt-10 border-t border-gray-900 text-center text-gray-600 text-xs">
+            © 2026 Brain AI Systems. All rights reserved.
+        </div>
+    </footer>
+
+    <script src="app.js?v=4.0"></script>
+    <script>
+        // Reveal on scroll
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 150;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        // Initial check
+        reveal();
+    </script>
+</body>
+
+</html>
