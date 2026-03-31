@@ -406,5 +406,5 @@ app.post('/api/upload', upload.single('document'), async (req, res) => {
 
 app.listen(port, () => {
     console.log(`🚀 Brain Translator running at http://localhost:${port}`);
-    console.log(`🌐 Engines: Google Proxy (High Quality) -> Lingva -> MyMemory -> ApyHub`);
+    console.log(`🌐 Engines: Google Cloud (Official) -> Google Proxy -> Lingva -> MyMemory -> ApyHub`);
 });
