@@ -6,10 +6,35 @@ const path = require('path');
 const fs = require('fs');
 const cors = require('cors');
 const PizZip = require('pizzip');
+const { TranslationServiceClient } = require('@google-cloud/translate').v3;
 require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+// Initialize GCP Client if credentials exist
+const credentialsPath = path.join(__dirname, 'credentials.json');
+let translationClient = null;
+let projectId = null;
+
+if (fs.existsSync(credentialsPath)) {
+    try {
+        const creds = JSON.parse(fs.readFileSync(credentialsPath));
+        projectId = creds.project_id;
+        translationClient = new TranslationServiceClient({ keyFilename: credentialsPath });
+        console.log(`✅ Loaded Google Cloud Translation for project: ${projectId}`);
+    } catch (e) {
+        console.warn(`⚠️ Failed to load Google Cloud credentials: ${e.message}`);
+    }
+} else if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+    try {
+        translationClient = new TranslationServiceClient(); 
+        projectId = process.env.GOOGLE_PROJECT_ID || 'auto-detect';
+        console.log(`✅ Loaded Google Cloud Translation from environment variable`);
+    } catch (e) {
+        console.warn(`⚠️ Failed to init GCP client from ENV: ${e.message}`);
+    }
+}
 
 app.use(cors());
 app.use(express.json());
@@ -46,6 +71,28 @@ const BATCH_SEP = '\n||||\n';
 const MAX_BATCH_CHARS = 3500;
 const MAX_CONCURRENT = 8;
 
+async function callGCP(texts, tgt) {
+    if (!translationClient) return null;
+    try {
+        // Find project ID from client if not set
+        if (!projectId || projectId === 'auto-detect') {
+            projectId = await translationClient.getProjectId();
+        }
+
+        const request = {
+            parent: `projects/${projectId}/locations/global`,
+            contents: texts,
+            mimeType: 'text/plain',
+            targetLanguageCode: tgt,
+        };
+        const [response] = await translationClient.translateText(request);
+        return response.translations.map(t => t.translatedText);
+    } catch (err) {
+        console.warn(`  ⚠️ GCP Translation Failed: ${err.message}`);
+    }
+    return null;
+}
+
 async function callApyHub(text, tgt) {
     if (!process.env.APY_TOKEN) return null;
     try {
@@ -53,9 +100,10 @@ async function callApyHub(text, tgt) {
         formData.append('file', Buffer.from(text), { filename: 'text.txt' });
         formData.append('language', tgt);
         const res = await axios.post('https://api.apyhub.com/translate/file', formData, {
-            headers: { ...formData.getHeaders(), 'apy-token': process.env.APY_TOKEN }
+            headers: { ...formData.getHeaders(), 'apy-token': process.env.APY_TOKEN },
+            responseType: 'arraybuffer'
         });
-        if (res.data?.translation) return res.data.translation;
+        if (res.data) return Buffer.from(res.data).toString();
     } catch (err) {
         console.warn(`  ⚠️ ApyHub Failed: ${err.message}`);
     }
@@ -80,18 +128,67 @@ async function callMyMemory(text, tgt) {
         );
         if (res.data?.responseStatus === 200) return res.data.responseData.translatedText;
     } catch { }
-    return text;
+    return null;
+}
+
+async function callGoogleProxy(text, src, tgt) {
+    try {
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${src}&tl=${tgt}&dt=t`;
+        const res = await axios.post(url, `q=${encodeURIComponent(text)}`, {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            timeout: 10000
+        });
+        if (res.data && res.data[0]) {
+            return res.data[0].map(x => x[0]).join('');
+        }
+    } catch (err) {
+        console.warn(`  ⚠️ Google Proxy Failed: ${err.message}`);
+    }
+    return null;
 }
 
 async function translateBatch(texts, src, tgt) {
+    // 1. HIGH-QUALITY: Official GCP API (Array-based, no separators needed)
+    let gcpResult = await callGCP(texts, tgt);
+    if (gcpResult && gcpResult.length === texts.length) {
+        console.log(`  ✨ [BATCH-GCP] Translated ${texts.length} nodes successfully.`);
+        return gcpResult;
+    }
+
     const combined = texts.join(BATCH_SEP);
-    let result = await callApyHub(combined, tgt);
-    if (!result) result = await callLingva(combined, src, tgt);
-    if (!result) result = await callMyMemory(combined, tgt);
+    let result = null;
+
+    // 2. STABLE: Google Proxy with sl=auto
+    result = await callGoogleProxy(combined, 'auto', tgt);
+    if (result) console.log(`  ✨ [BATCH-PROXY] Translated ${texts.length} nodes.`);
+    
+    // 3. Fallbacks
+    if (!result) {
+        result = await callLingva(combined, src, tgt);
+        if (result) console.log(`  ✨ [BATCH-LINGVA] Translated ${texts.length} nodes.`);
+    }
+    if (!result) {
+        result = await callMyMemory(combined, tgt);
+        if (result) console.log(`  ✨ [BATCH-MYMEMORY] Translated ${texts.length} nodes.`);
+    }
+    if (!result) {
+        result = await callApyHub(combined, tgt);
+        if (result) console.log(`  ✨ [BATCH-APYHUB] Translated ${texts.length} nodes.`);
+    }
+    
+    // ApyHub expects the file translation to work differently, 
+    // but we can try its simple translate endpoint if it exists
+    // (ApyHub file endpoint returns binary, so it doesn't fit here well)
+
+    // If all entirely fail, we return the original english so it doesn't corrupt the file
+    if (!result) {
+        console.warn(`  ❌ All engines failed for this batch.`);
+        return texts;
+    }
 
     const parts = result.split(/\s*\|\|\|\|\s*/).map(s => s.trim());
     if (parts.length !== texts.length) {
-        console.warn(`  ⚠️ Batch split mismatch: Expected ${texts.length}, got ${parts.length}.`);
+        console.warn(`  ⚠️ Batch split mismatch: Expected ${texts.length}, got ${parts.length}. Parts:`, parts);
     }
     return texts.map((orig, i) => parts[i] || orig);
 }
@@ -206,11 +303,11 @@ app.post('/api/upload', upload.single('document'), async (req, res) => {
 
     const { buffer, originalname } = req.file;
     const targetLang = req.body.targetLanguage;
-    const srcLang = 'en';
+    const srcLang = 'auto'; // Enable auto-detection by default
     const ext = path.extname(originalname).toLowerCase();
     const basename = path.basename(originalname, ext);
 
-    console.log(`\n🚀 Translating "${originalname}" → ${targetLang}`);
+    console.log(`\n🚀 Translating "${originalname}" (auto-detect) → ${targetLang}`);
 
     const supported = ['.docx', '.pptx', '.xlsx', '.pdf'];
     if (!supported.includes(ext)) {
@@ -309,5 +406,5 @@ app.post('/api/upload', upload.single('document'), async (req, res) => {
 
 app.listen(port, () => {
     console.log(`🚀 Brain Translator running at http://localhost:${port}`);
-    console.log(`🌐 Engines: ApyHub (High Quality) -> Lingva -> MyMemory`);
+    console.log(`🌐 Engines: Google Proxy (High Quality) -> Lingva -> MyMemory -> ApyHub`);
 });
